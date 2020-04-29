@@ -8,36 +8,37 @@
 using namespace std;
 
 GLdouble width, height;
-vector<unique_ptr<Shape>> character;
+int wd;
+Circle c;
+Rect ground;
 int characterYDirection;
-void populateCharacter() {
-    // Three white circles
-    // red, green, blue, alpha, x, y, radius
-    character.push_back(make_unique<Circle>(1, 1, 1, 1, 100, 400, 100));
-    character.push_back(make_unique<Circle>(1, 1, 1, 1, 100, 250, 75));
-    character.push_back(make_unique<Circle>(1, 1, 1, 1, 100, 130, 50));
-    // Black buttons
-    character.push_back(make_unique<Circle>(0, 0, 0, 1, 100, 230, 10));
-    character.push_back(make_unique<Circle>(0, 0, 0, 1, 100, 260, 10));
-    character.push_back(make_unique<Circle>(0, 0, 0, 1, 100, 290, 10));
-    // Eyes
-    character.push_back(make_unique<Circle>(0, 0, 0, 1, 80, 120, 8));
-    character.push_back(make_unique<Circle>(0, 0, 0, 1, 120, 120, 8));
-    // Mouth
-    character.push_back(make_unique<Circle>(0, 0, 0, 1, 75, 145, 5));
-    character.push_back(make_unique<Circle>(0, 0, 0, 1, 85, 155, 5));
-    character.push_back(make_unique<Circle>(0, 0, 0, 1, 100, 160, 5));
-    character.push_back(make_unique<Circle>(0, 0, 0, 1, 115, 155, 5));
-    character.push_back(make_unique<Circle>(0, 0, 0, 1, 125, 145, 5));
+vector<unique_ptr<Shape>> character;
+vector<Rect> obstacle;
+
+void populateCharacter(){
+
+}
+
+void populateObstacle(){
+    point2D gnd_obstacle = point2D(800,325);
+    point2D air_obstacle = point2D(1400,75);
+    color obstacle_color = color(1,.7,.4,1);
+    obstacle.push_back(Rect(obstacle_color,gnd_obstacle,150,150));
+    obstacle.push_back(Rect(obstacle_color,air_obstacle,150,150));
 }
 
 // first function called to initialize graphics
 void init(){
-    srand(time(0));
-    width = 1000;
-    height = 400;
-    populateCharacter();
-    characterYDirection = 0;
+    width = 1500;
+    height = 500;
+
+    // set ground
+    ground.setColor(color(.4,.2,.2,1));
+    ground.setCenter(750,450);
+    ground.setHeight(100);
+    ground.setWidth(1500);
+
+    populateObstacle();
 }
 
 /* Initialize OpenGL Graphics */
@@ -50,7 +51,7 @@ void initGL() {
  whenever the window needs to be re-painted. */
 void display() {
     // Tell OpenGL to use the whole window for drawing
-    glViewport(0, 0, width, height); // DO NOT CHANGE THIS LINE
+    glViewport(0, 0, 2*width, 2*height); // DO NOT CHANGE THIS LINE
 
     // Do an orthographic parallel projection with the coordinate
     // system set to first quadrant, limited by screen/window size
@@ -66,79 +67,69 @@ void display() {
     /*
      * Draw here
      */
-    // ground shape
-    glColor3f(0.34f, 0.1f, 0.1f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(-1.0f, -0.5f);
-    glTexCoord2f(1.0f, -0.5f);
-    glTexCoord2f(1.0f, -1.0f);
-    glTexCoord2f(-1.0f, -1.0f);
-    glEnd();
 
-    // Draw the character with ~polymorphism~
-    for (unique_ptr<Shape> &s : character) {
-        s->draw();
+    ground.draw();
+
+    for (Rect &r : obstacle) {
+        r.draw();
     }
 
     glFlush();  // Render now
 }
 
-// http://www.theasciicode.com.ar/ascii-control-characters/escape-ascii-code-27.html
+
 void kbdS(int key, int x, int y) {
     switch(key) {
-        case GLUT_KEY_UP:
-            characterYDirection = 1;
-            break;
         case GLUT_KEY_DOWN:
             characterYDirection = -1;
+            break;
+        case GLUT_KEY_UP:
+            characterYDirection = 1;
             break;
     }
 
     glutPostRedisplay();
 }
 
+
 void timer(int dummy) {
-/*
-    for (Rect &r : ) {
-        r.moveX(r.getWidth());
-        if (r.getCenterX() > (width + r.getWidth())) {
-            // TODO: set obstacle random up or down (2 specific locations)
-            r.setCenter(rand() % int(width), -r.getRadius());
+    for (Rect &r : obstacle) {
+        r.moveX(-r.getWidth()/25);
+        if (r.getCenterX() < 1) {
+            // choose at random if obstacle will be an air or ground obstacle
+            int type  = rand()%2;
+            if (type == 0){
+                r.setCenter(1400,75);
+            } else{
+                r.setCenter(1400,325);
+            }
         }
     }
 
     glutPostRedisplay();
     glutTimerFunc(30, timer, dummy);
-    */
 }
 
-void timerCharacter(int dummy) {
+/**
+void timerSnowperson(int dummy) {
+
     if (characterYDirection < 0) {
+        // Move the snowperson left using ~polymorphism~
         for (unique_ptr<Shape> &s : character) {
-            s->moveX(-5);
+            s->moveX(-1);
         }
     } else if (characterYDirection > 0) {
-        jump();
+        // Move the snowperson right using ~polymorphism~
+        for (unique_ptr<Shape> &s : character) {
+            s->moveX(1);
+        }
     }
 
     glutPostRedisplay();
-    glutTimerFunc(30, timerCharacter, dummy);
+    glutTimerFunc(30, timerSnowperson, dummy);
 }
 
-void jump(){
-    int gravity = -10;
-    int jumpCounter;
-
-    //while()
-    for (unique_ptr<Shape> &s : character) {
-        s->moveY(1);
-    }
-}
-
-void duck(){
-
-}
-
+**/
 /* Main function: GLUT runs as a console application starting at main()  */
 int main(int argc, char** argv) {
 
@@ -151,7 +142,7 @@ int main(int argc, char** argv) {
     glutInitWindowSize((int)width, (int)height);
     glutInitWindowPosition(250, 180); // Position the window's initial top-left corner
     /* create the window and store the handle to it */
-    glutCreateWindow("Jump and Duck game" /* title */ );
+    wd = glutCreateWindow("Graphics Examples!" /* title */ );
 
     // Register callback handler for window re-paint event
     glutDisplayFunc(display);
@@ -164,7 +155,7 @@ int main(int argc, char** argv) {
 
     // handles timer
     glutTimerFunc(0, timer, 0);
-    glutTimerFunc(0, timerCharacter, 0);
+    //glutTimerFunc(0, timerSnowperson, 0);
 
     // Enter the event-processing loop
     glutMainLoop();

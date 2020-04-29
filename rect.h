@@ -5,8 +5,8 @@
 
 class Rect : public Shape {
 private:
-    double width;
-    double height;
+    double width{};
+    double height{};
 public:
     /* Constructors */
     Rect();

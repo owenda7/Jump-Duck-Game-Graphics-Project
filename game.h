@@ -1,9 +1,6 @@
 #ifndef OA_FINAL_PROJECT_GRAPHICS_GAME_H
 #define OA_FINAL_PROJECT_GRAPHICS_GAME_H
 
-#ifndef graphics_h
-#define graphics_h
-
 #include "circle.h"
 
 #include <stdlib.h>
@@ -42,7 +39,5 @@ void timer(int dummy);
 
 void timerCharacter(int dummy);
 
-
-#endif /* graphics_h */
 
 #endif //OA_FINAL_PROJECT_GRAPHICS_GAME_H
