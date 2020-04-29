@@ -9,6 +9,7 @@ using namespace std;
 
 GLdouble width, height;
 int wd;
+int score;
 Circle c;
 Rect ground;
 int characterYDirection;
@@ -16,11 +17,12 @@ vector<unique_ptr<Shape>> character;
 vector<Rect> obstacle;
 
 void populateCharacter(){
-
+    color character_color = color(0,.4,.2,1);
+    character.push_back(make_unique<Rect>(character_color,point2D(20,20),150,150));
 }
 
 void populateObstacle(){
-    point2D gnd_obstacle = point2D(800,325);
+    point2D gnd_obstacle = point2D(700,325);
     point2D air_obstacle = point2D(1400,75);
     color obstacle_color = color(1,.7,.4,1);
     obstacle.push_back(Rect(obstacle_color,gnd_obstacle,150,150));
@@ -31,6 +33,7 @@ void populateObstacle(){
 void init(){
     width = 1500;
     height = 500;
+    score = 0;
 
     // set ground
     ground.setColor(color(.4,.2,.2,1));
@@ -94,14 +97,17 @@ void kbdS(int key, int x, int y) {
 
 void timer(int dummy) {
     for (Rect &r : obstacle) {
-        r.moveX(-r.getWidth()/25);
+        //TODO: Object detection
+        r.moveX(-(r.getWidth()/30) - score/5);
         if (r.getCenterX() < 1) {
             // choose at random if obstacle will be an air or ground obstacle
             int type  = rand()%2;
             if (type == 0){
                 r.setCenter(1400,75);
+                score ++;
             } else{
                 r.setCenter(1400,325);
+                score ++;
             }
         }
     }
@@ -110,8 +116,8 @@ void timer(int dummy) {
     glutTimerFunc(30, timer, dummy);
 }
 
-/**
-void timerSnowperson(int dummy) {
+
+void timerCharacter(int dummy) {
 
     if (characterYDirection < 0) {
         // Move the snowperson left using ~polymorphism~
@@ -126,10 +132,10 @@ void timerSnowperson(int dummy) {
     }
 
     glutPostRedisplay();
-    glutTimerFunc(30, timerSnowperson, dummy);
+    glutTimerFunc(30, timerCharacter, dummy);
 }
 
-**/
+
 /* Main function: GLUT runs as a console application starting at main()  */
 int main(int argc, char** argv) {
 
@@ -142,7 +148,7 @@ int main(int argc, char** argv) {
     glutInitWindowSize((int)width, (int)height);
     glutInitWindowPosition(250, 180); // Position the window's initial top-left corner
     /* create the window and store the handle to it */
-    wd = glutCreateWindow("Graphics Examples!" /* title */ );
+    wd = glutCreateWindow("Jump and Duck Game" /* title */ );
 
     // Register callback handler for window re-paint event
     glutDisplayFunc(display);
@@ -155,7 +161,7 @@ int main(int argc, char** argv) {
 
     // handles timer
     glutTimerFunc(0, timer, 0);
-    //glutTimerFunc(0, timerSnowperson, 0);
+    glutTimerFunc(0, timerCharacter, 0);
 
     // Enter the event-processing loop
     glutMainLoop();
