@@ -28,6 +28,9 @@ void initGL();
 // Draw the window - this is where all the GL actions are
 void display();
 
+// purely for escape key
+void kbd(unsigned char key, int x, int y);
+
 // Trap and process special keyboard events
 void kbdS(int key, int x, int y);
 
