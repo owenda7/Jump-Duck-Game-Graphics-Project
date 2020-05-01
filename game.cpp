@@ -24,7 +24,7 @@ int DUCK;
 
 bool GAME_OVER;
 
-
+// adds shapes to vector character to create the main character
 void populateCharacter(){
     color green = color(0,.4,.2,1);
     color black = color(0,0,0,1);
@@ -46,12 +46,9 @@ void populateCharacter(){
     character.push_back(make_unique<Circle>(black,160, 225, 4));
     character.push_back(make_unique<Circle>(black,140, 225, 4));
     character.push_back(make_unique<Circle>(black,150, 245, 6));
-
-
-
-
 }
 
+// adds shapes to vector obstacle to build the obstacles
 void populateObstacle(){
     point2D gnd_obstacle = point2D(700,350);
     point2D air_obstacle = point2D(1400,200);
@@ -103,10 +100,7 @@ void display() {
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // DO NOT CHANGE THIS LINE
 
-    /*
-     * Draw here
-     */
-
+    /**** DRAWINGS ****/
     ground.draw();
 
     for (Rect &r : obstacle) {
@@ -116,9 +110,11 @@ void display() {
     for (unique_ptr<Shape> &s : character) {
         s->draw();
     }
+
     glFlush();  // Render now
 }
 
+// escape key to quit game
 void kbd(unsigned char key, int x, int y) {
     switch(key) {
         // escape
@@ -131,6 +127,7 @@ void kbd(unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
+// gets up and down arrow key inputs
 void kbdS(int key, int x, int y) {
     switch(key) {
         case GLUT_KEY_DOWN:
@@ -143,6 +140,7 @@ void kbdS(int key, int x, int y) {
     glutPostRedisplay();
 }
 
+// function checks for collisions
 bool isGameOver(Rect r){
     if (r.getCenterY() == 350 && (character[0]->getCenterY()) > 300){
         GAME_OVER = true;
@@ -160,8 +158,8 @@ bool isGameOver(Rect r){
     return false;
 }
 
+// handles object movement
 void timer(int dummy) {
-
     for (Rect &r : obstacle) {
         if (r.getCenterX() < 225 && r.getCenterX() > 100){
             isGameOver(r);
@@ -184,9 +182,8 @@ void timer(int dummy) {
     glutTimerFunc(30, timer, dummy);
 }
 
-
+// handles character movement
 void timerCharacter(int dummy) {
-
     if (characterYDirection > 0) {
         if (JUMP_DIRECTION == 0){
             JUMP_DIRECTION = 1;
@@ -255,12 +252,12 @@ void timerCharacter(int dummy) {
 }
 
 
-/* Main function: GLUT runs as a console application starting at main()  */
+/* Main function */
 int main(int argc, char** argv) {
 
     init();
 
-    glutInit(&argc, argv);          // Initialize GLUT
+    glutInit(&argc, argv);  // Initialize GLUT
 
     glutInitDisplayMode(GLUT_RGBA);
 
